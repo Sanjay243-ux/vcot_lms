@@ -1,56 +1,99 @@
-# Welcome to your Expo app 👋
+# VCOT Student LMS Mobile Application
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A clean, modern, beginner-friendly university Student Learning Management System (LMS) mobile application built with **React Native**, **Expo Router**, **Gluestack UI**, **NativeWind (Tailwind CSS)**, **Lucide Icons**, **Google Fonts (Inter)**, and **Supabase**.
 
-## Get started
+---
 
-1. Install dependencies
+## Features
 
-   ```bash
-   npm install
-   ```
+### 1. Authentication
+- Student Registration (`Full Name`, `Student ID`, `Department`, `Email`, `Password`)
+- Student Sign In with Email & Password
+- Forgot Password email reset flow
+- Secure session persistence & Logout confirmation dialog
+- Interactive Preview Mode when `.env` is not yet configured
 
-2. Start the app
+### 2. Home Dashboard
+- Personalized student welcome header with avatar & department badge
+- Summary cards for **Total Tasks**, **Pending**, and **Completed** assignments
+- **Upcoming Deadlines** sorted by nearest due date
+- **Recently Added** assignments with quick access to details
 
-   ```bash
-   npx expo start
-   ```
+### 3. My Tasks
+- View all assigned tasks in a clean card layout
+- Filter by **All**, **Pending**, and **Completed** with live counts
+- Instant search across assignment titles, course names, and descriptions
+- **Add Task** dialog to create and track additional assignments
 
-In the output, you'll find options to open the app in a
+### 4. Assignment Details
+- Course name, assignment title, status badge, assigned date, due date, and full instructions
+- **Mark as Completed** button with confirmation dialog (and option to reopen if needed)
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+### 5. Notifications & Student Profile
+- Unread badge counter on the **Notifications** tab + **Mark all read** support
+- **Student Profile** displaying avatar photo picker (`expo-image-picker`), Full Name, Student ID, Email, and Department
+- Inline **Edit Profile** form with input validation
 
-You can start developing by editing the files inside the **src/app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+---
 
-## Get a fresh project
+## Project Structure
 
-When you're ready, run:
-
-```bash
-npm run reset-project
+```text
+vcot_lms/
+├── supabase/
+│   └── schema.sql                 # Tables, RLS policies, auth signup trigger & storage bucket
+├── src/
+│   ├── app/                       # Expo Router navigation & screens
+│   │   ├── _layout.tsx            # Root layout (Fonts, GluestackUIProvider, Auth Guard)
+│   │   ├── (auth)/                # Login, Register, Forgot Password screens
+│   │   ├── (tabs)/                # Bottom Tabs: Home, My Tasks, Notifications, Profile
+│   │   └── task/[id].tsx          # Assignment Details screen
+│   ├── components/
+│   │   ├── common/                # ScreenHeader, EmptyState, LoadingState, AlertBanner
+│   │   ├── tasks/                 # TaskCard, StatusBadge, CreateTaskModal
+│   │   └── ui/                    # Gluestack UI + NativeWind reusable primitives
+│   ├── constants/                 # Color palette tokens
+│   ├── context/                   # LmsContext state & Supabase auth listener
+│   ├── hooks/                     # useAuth, useTasks, useNotifications
+│   ├── services/                  # Supabase client & data services
+│   ├── types/                     # Strict TypeScript interfaces & Database schema types
+│   └── utils/                     # Input validation & date formatting helpers
+├── .env.example                   # Environment variable template
+├── tailwind.config.js             # NativeWind / Tailwind CSS configuration
+└── package.json
 ```
 
-This command will move the starter code to the **example** directory and create a blank **src/app** directory where you can start developing.
+---
 
-### Other setup steps
+## Quick Start
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+### 1. Install Dependencies
 
-## Learn more
+```bash
+cd vcot_lms
+npm install
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+### 2. Configure Supabase (Recommended)
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+1. Create a project in [Supabase](https://supabase.com).
+2. Open **SQL Editor** in your Supabase Dashboard and run [`supabase/schema.sql`](./supabase/schema.sql).
+   - Creates `students`, `tasks`, and `notifications` tables.
+   - Enables **Row Level Security (RLS)** so students can only read/write their own records.
+   - Adds an automatic signup trigger that creates the student profile and starter assignments upon registration.
+3. Copy `.env.example` to `.env` and fill in your **Project URL** and **Anon Public Key** (never use a `service_role` key in the mobile app):
 
-## Join the community
+```env
+EXPO_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
+EXPO_PUBLIC_SUPABASE_ANON_KEY=your-public-anon-key
+```
 
-Join our community of developers creating universal apps.
+> **Note:** If `.env` is not configured yet, the app automatically runs in **Preview Mode** (`student@university.edu` / `password123`) so you can explore every screen immediately.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+### 3. Start the App
+
+```bash
+npx expo start -c
+```
+
+Press `a` for Android, `i` for iOS Simulator, `w` for Web, or scan the QR code with Expo Go.
